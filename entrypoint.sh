@@ -22,7 +22,7 @@ while true; do
   # If the grep above finds anything, it exit with 0 status
   # If it is not  0, then something is wrong
   if [ $Tomcat_1_STATUS -ne 0 ]; then
-    echo "Tomcat process has already exited."
+    echo "Tomcat process has exited without unexpectedly."
     exit 1
   fi
 sleep 5
