@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Start Tomcat
 /opt/tomcat/bin/startup.sh
 status=$?
@@ -7,13 +8,13 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
+# Catches SIGTERM & SIGINT and runs gracefull shutdown. 
+# Important: sleep seems to prevent SIGTERM reaction and delays it, so 5 seconds is pretty good
+trap "/opt/tomcat/bin/shutdown.sh; exit $?" SIGTERM SIGINT
 
-trap "/opt/tomcat/bin/shutdown.sh;exit $?" SIGTERM SIGINT
-# Naive check runs checks once a minute to see if either of the processes exited.
-# This illustrates part of the heavy lifting you need to do if you want to run
-# more than one service in a container. The container exits with an error
-# if it detects that either of the processes has exited.
-# Otherwise it loops forever, waking up every 60 seconds
+# Checks every 5 second - longer will delay the response to SIGTERM
+# Assume that if process is not running - it failed, as we trap the SIGTERM & SIGINT, 
+# and gracefully shutting down the server and exiting earlier with exit status of shutdown.sh script
 
 while true; do
   ps aux |grep Bootstrap |grep -q -v grep
